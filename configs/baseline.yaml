@@ -1,0 +1,29 @@
+project:
+  seed: 42
+
+data:
+  dataset_id: nikolasgegenava/cat-breeds
+  raw_dir: data/raw
+  processed_dir: data/processed
+  # Must contain exactly 8 valid breed names before running dataprep.
+  selected_breeds: []
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  image_size: 224
+  num_workers: 0
+
+training:
+  model_name: resnet50
+  batch_size: 32
+  epochs: 10
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  use_class_weights: true
+  early_stopping_patience: 4
+  freeze_backbone: false
+  device: cuda
+  gpu_id: 0
+
+inference:
+  top_k: 3

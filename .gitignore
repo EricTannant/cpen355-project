@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.pytest_cache/
+.mypy_cache/
+
+# Dataset and generated artifacts
+data/raw/
+data/processed/*.csv
+data/processed/*.json
+outputs/checkpoints/*.pt
+outputs/checkpoints/*.pth
+outputs/metrics/*.json
+outputs/metrics/*.csv
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
