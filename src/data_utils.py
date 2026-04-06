@@ -17,7 +17,7 @@ def iter_image_files(root: Path) -> Iterable[Path]:
 def build_full_metadata(raw_dir: Path) -> pd.DataFrame:
     rows = []
     for image_path in iter_image_files(raw_dir):
-        label = image_path.parent.name.strip()
+        label = "_".join(image_path.stem.split("_")[:-1]).strip()
         if not label:
             continue
         rows.append({"image_path": str(image_path.resolve()), "breed": label})

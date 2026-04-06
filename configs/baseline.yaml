@@ -2,11 +2,19 @@ project:
   seed: 42
 
 data:
-  dataset_id: nikolasgegenava/cat-breeds
-  raw_dir: data/raw
+  dataset_id: zippyz/cats-and-dogs-breeds-classification-oxford-dataset
+  raw_dir: data/raw/images
   processed_dir: data/processed
   # Must contain exactly 8 valid breed names before running dataprep.
-  selected_breeds: []
+  selected_breeds:
+    - Sphynx
+    - Siamese
+    - Russian_Blue
+    - Bengal
+    - pug
+    - great_pyrenees
+    - shiba_inu
+    - yorkshire_terrier
   train_ratio: 0.7
   val_ratio: 0.15
   test_ratio: 0.15
