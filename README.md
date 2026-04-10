@@ -1,7 +1,7 @@
 # CPEN355 Project
 
 Baseline PyTorch pipeline for an 8-breed cat classifier using the Kaggle dataset:
-`nikolasgegenava/cat-breeds`.
+oxford cats and dogs dataset (dataset id: zippyz/cats-and-dogs-breeds-classification-oxford-dataset)
 
 ## What is implemented
 
@@ -62,14 +62,14 @@ Example:
 ```yaml
 data:
 	selected_breeds:
-		- Bengal
-		- Birman
-		- Bombay
-		- British Shorthair
-		- Maine Coon
-		- Persian
-		- Ragdoll
+		- Sphynx
 		- Siamese
+		- Russian_Blue
+		- Bengal
+		- pug
+		- great_pyrenees
+		- shiba_inu
+		- yorkshire_terrier
 ```
 
 Note: dataprep fails fast if the list is not exactly 8 unique valid breeds.

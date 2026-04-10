@@ -1,0 +1,36 @@
+project:
+  seed: 42
+
+data:
+  dataset_id: zippyz/cats-and-dogs-breeds-classification-oxford-dataset
+  raw_dir: data/raw/images
+  processed_dir: data/processed
+  selected_breeds:
+    - Sphynx
+    - Siamese
+    - Russian_Blue
+    - Bengal
+    - pug
+    - great_pyrenees
+    - shiba_inu
+    - yorkshire_terrier
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  image_size: 224
+  num_workers: 0
+
+training:
+  model_name: custom_cnn
+  batch_size: 32
+  epochs: 20
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  use_class_weights: true
+  early_stopping_patience: 5
+  freeze_backbone: false
+  device: cuda
+  gpu_id: 0
+
+inference:
+  top_k: 3
