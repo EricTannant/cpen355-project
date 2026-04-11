@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
 
-class CatBreedDataset(Dataset):
+class CatDogBreedDataset(Dataset):
     def __init__(self, csv_path: str | Path, image_size: int, is_train: bool) -> None:
         self.df = pd.read_csv(csv_path)
         if "image_path" not in self.df.columns or "label" not in self.df.columns:
@@ -61,13 +61,13 @@ def create_dataloaders(
 ):
     processed_dir = Path(processed_dir)
 
-    train_dataset = CatBreedDataset(
+    train_dataset = CatDogBreedDataset(
         csv_path=processed_dir / "train.csv", image_size=image_size, is_train=True
     )
-    val_dataset = CatBreedDataset(
+    val_dataset = CatDogBreedDataset(
         csv_path=processed_dir / "val.csv", image_size=image_size, is_train=False
     )
-    test_dataset = CatBreedDataset(
+    test_dataset = CatDogBreedDataset(
         csv_path=processed_dir / "test.csv", image_size=image_size, is_train=False
     )
 
@@ -94,3 +94,26 @@ def create_dataloaders(
     )
 
     return train_loader, val_loader, test_loader
+
+
+def create_test_dataloader(
+    processed_dir: str | Path,
+    image_size: int,
+    batch_size: int,
+    num_workers: int,
+):
+    processed_dir = Path(processed_dir)
+
+    test_dataset = CatDogBreedDataset(
+        csv_path=processed_dir / "test.csv", image_size=image_size, is_train=False
+    )
+
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True,
+    )
+
+    return test_loader

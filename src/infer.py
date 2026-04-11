@@ -20,7 +20,24 @@ def run_inference(config_path: str, checkpoint_path: str, image_path: str, top_k
         config = yaml.safe_load(handle)
     validate_baseline_constraints(config)
 
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint_path_obj = Path(checkpoint_path)
+    if not checkpoint_path_obj.exists():
+        if "paths" in config and "checkpoint_dir" in config["paths"]:
+            alt_path = Path(config["paths"]["checkpoint_dir"]) / "best.pt"
+            if alt_path.exists():
+                checkpoint_path_obj = alt_path
+        if not checkpoint_path_obj.exists():
+            raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path_obj}")
+
+    image_path_obj = Path(image_path)
+    if not image_path_obj.exists():
+        raise FileNotFoundError(
+            "Image not found: "
+            f"{image_path_obj}. "
+            "Provide a valid path, for example one from data/processed/test.csv"
+        )
+
+    checkpoint = torch.load(str(checkpoint_path_obj), map_location="cpu")
     label_to_index = checkpoint["label_to_index"]
     index_to_label = {int(v): k for k, v in label_to_index.items()}
 
@@ -36,7 +53,7 @@ def run_inference(config_path: str, checkpoint_path: str, image_path: str, top_k
     model.eval()
 
     transform = build_transform(image_size=int(config["data"]["image_size"]), is_train=False)
-    image = Image.open(image_path).convert("RGB")
+    image = Image.open(image_path_obj).convert("RGB")
     x = transform(image).unsqueeze(0).to(device)
 
     with torch.no_grad():

@@ -1,7 +1,7 @@
 # CPEN355 Project
 
-Baseline PyTorch pipeline for an 8-breed cat classifier using the Kaggle dataset:
-oxford cats and dogs dataset (dataset id: zippyz/cats-and-dogs-breeds-classification-oxford-dataset)
+PyTorch pipeline for 8-breed pet image classification using the Kaggle dataset:
+`zippyz/cats-and-dogs-breeds-classification-oxford-dataset`
 
 ## What is implemented
 
@@ -9,7 +9,7 @@ oxford cats and dogs dataset (dataset id: zippyz/cats-and-dogs-breeds-classifica
 - Config-driven dataprep that requires exactly 8 selected breeds.
 - Deterministic stratified train/val/test split generation.
 - Fixed image preprocessing to 224x224 for train, eval, and inference.
-- Transfer-learning training script (default: pretrained ResNet50).
+- Training for both a custom CNN and transfer-learning ResNet50.
 - Evaluation script with classification metrics and confusion matrix export.
 - Single-image inference CLI with top-k probabilities.
 
@@ -18,6 +18,8 @@ oxford cats and dogs dataset (dataset id: zippyz/cats-and-dogs-breeds-classifica
 ```
 configs/
 	baseline.yaml
+	cnn.yaml
+	resnet50.yaml
 data/
 	raw/
 	processed/
@@ -74,21 +76,73 @@ data:
 
 Note: dataprep fails fast if the list is not exactly 8 unique valid breeds.
 
-## Run workflow
+## Local run order
 
-1. Download full dataset:
+Run in this order:
+
+1. Download raw dataset:
 
 ```powershell
 python scripts/download_data.py --config configs/baseline.yaml
 ```
 
-2. Prepare filtered subset and splits:
+2. Prepare filtered metadata and splits (required before train/evaluate):
 
 ```powershell
 python scripts/prepare_data.py --config configs/baseline.yaml
 ```
 
-Outputs written to `data/processed/` include:
+3. Train model.
+
+4. Evaluate model.
+
+## Train and evaluate each model
+
+### CNN
+
+Train:
+
+```powershell
+python -m src.train --config configs/cnn.yaml
+```
+
+Evaluate:
+
+```powershell
+python -m src.evaluate --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/best.pt
+```
+
+### ResNet50 baseline
+
+Train:
+
+```powershell
+python -m src.train --config configs/baseline.yaml
+```
+
+Evaluate:
+
+```powershell
+python -m src.evaluate --config configs/baseline.yaml --checkpoint outputs/checkpoints/baseline/best.pt
+```
+
+### ResNet50 extended config
+
+Train:
+
+```powershell
+python -m src.train --config configs/resnet50.yaml
+```
+
+Evaluate:
+
+```powershell
+python -m src.evaluate --config configs/resnet50.yaml --checkpoint outputs/checkpoints/resnet50/best.pt
+```
+
+## Output files
+
+Data prep writes to `data/processed/`:
 
 - `metadata_full.csv`
 - `metadata_filtered.csv`
@@ -96,28 +150,27 @@ Outputs written to `data/processed/` include:
 - `label_to_index.json`
 - `split_summary.json`
 
-3. Train baseline model:
+Model checkpoints:
 
-```powershell
-python -m src.train --config configs/baseline.yaml
-```
+- CNN: `outputs/checkpoints/cnn/`
+- Baseline ResNet50: `outputs/checkpoints/baseline/`
+- ResNet50 config: `outputs/checkpoints/resnet50/`
 
-4. Evaluate best checkpoint:
+Metrics:
 
-```powershell
-python -m src.evaluate --config configs/baseline.yaml --checkpoint outputs/checkpoints/best.pt
-```
+- `outputs/metrics/eval_metrics.json`
+- `outputs/metrics/confusion_matrix.csv`
 
-5. Run inference on one image:
+## Colab workflow
 
-```powershell
-python -m src.infer --config configs/baseline.yaml --checkpoint outputs/checkpoints/best.pt --image path\to\cat.jpg --top-k 3
-```
+Upload the `project_workflow.ipynb` notebook to Google colab and run the cells.
+
+Note: Either manually create the ~/.kaggle/kaggle.json file or add it to your Google Drive under Drive/kaggle/kaggle.json which will be automatically cloned via the notebook cells.
 
 ## Notes
 
 - Image shape is fixed to 224x224 via torchvision `Resize((224, 224))`.
-- The model expects 8 classes for baseline runs.
+- The current validation rule requires exactly 8 classes.
 - Evaluation artifacts are saved under `outputs/metrics/`.
 - Training defaults to `training.device: cuda` and falls back to CPU if CUDA is unavailable.
 - Single-GPU training is controlled with `training.gpu_id` (default `0`).
