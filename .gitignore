@@ -17,6 +17,7 @@ outputs/checkpoints/*.pt
 outputs/checkpoints/*.pth
 outputs/metrics/*.json
 outputs/metrics/*.csv
+outputs/*
 
 # Jupyter
 .ipynb_checkpoints/

@@ -154,7 +154,14 @@ def run_training(config_path: str) -> None:
     stale_epochs = 0
     history = []
 
-    checkpoints_dir = Path("outputs/checkpoints")
+    # Use checkpoint_dir from config if available, otherwise create model-specific directory
+    if "paths" in config and "checkpoint_dir" in config["paths"]:
+        checkpoints_dir = Path(config["paths"]["checkpoint_dir"])
+    else:
+        model_name = str(train_cfg["model_name"])
+        checkpoints_dir = Path("outputs/checkpoints") / model_name
+
+    checkpoints_dir.mkdir(parents=True, exist_ok=True)
     best_path = checkpoints_dir / "best.pt"
     last_path = checkpoints_dir / "last.pt"
 

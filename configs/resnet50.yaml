@@ -32,5 +32,8 @@ training:
   device: cuda
   gpu_id: 0
 
+paths:
+  checkpoint_dir: outputs/checkpoints/resnet50
+
 inference:
   top_k: 3

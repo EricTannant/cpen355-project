@@ -24,7 +24,16 @@ def run_evaluation(config_path: str, checkpoint_path: str) -> None:
     train_cfg = config["training"]
 
     processed_dir = Path(data_cfg["processed_dir"])
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint_path = Path(checkpoint_path)
+    if not checkpoint_path.exists():
+        if "paths" in config and "checkpoint_dir" in config["paths"]:
+            alt_path = Path(config["paths"]["checkpoint_dir"]) / "best.pt"
+            if alt_path.exists():
+                checkpoint_path = alt_path
+        if not checkpoint_path.exists():
+            raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
+    
+    checkpoint = torch.load(str(checkpoint_path), map_location="cpu")
     label_to_index = checkpoint["label_to_index"]
     index_to_label = {int(v): k for k, v in label_to_index.items()}
 
