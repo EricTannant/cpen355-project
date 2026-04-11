@@ -209,7 +209,7 @@ def run_training(config_path: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train cat breed classifier.")
+    parser = argparse.ArgumentParser(description="Train cat/dog breed classifier.")
     parser.add_argument("--config", default="configs/baseline.yaml")
     args = parser.parse_args()
     run_training(args.config)

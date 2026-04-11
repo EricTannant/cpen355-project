@@ -1,6 +1,6 @@
 # CPEN355 Project
 
-PyTorch pipeline for 8-breed pet image classification using the Kaggle dataset:
+PyTorch pipeline for 8-breed pet (dog/cat) breed image classification using the Kaggle dataset:
 `zippyz/cats-and-dogs-breeds-classification-oxford-dataset`
 
 ## What is implemented
@@ -74,7 +74,7 @@ data:
 		- yorkshire_terrier
 ```
 
-Note: dataprep fails fast if the list is not exactly 8 unique valid breeds.
+Note: dataprep fails if the list is not exactly 8 unique valid breeds.
 
 ## Local run order
 
@@ -165,12 +165,12 @@ Metrics:
 
 Upload the `project_workflow.ipynb` notebook to Google colab and run the cells.
 
-Note: Either manually create the ~/.kaggle/kaggle.json file or add it to your Google Drive under Drive/kaggle/kaggle.json which will be automatically cloned via the notebook cells.
+Note: Either manually create the `~/.kaggle/kaggle.json` file or add it to your Google Drive under `Drive/kaggle/kaggle.json` which will be automatically cloned via the notebook cells.
 
 ## Notes
 
 - Image shape is fixed to 224x224 via torchvision `Resize((224, 224))`.
-- The current validation rule requires exactly 8 classes.
+- The current validation rule requires exactly 8 classes, though this may be expanded in the future.
 - Evaluation artifacts are saved under `outputs/metrics/`.
-- Training defaults to `training.device: cuda` and falls back to CPU if CUDA is unavailable.
+- Training defaults to CUDA and falls back to CPU if CUDA is unavailable.
 - Single-GPU training is controlled with `training.gpu_id` (default `0`).

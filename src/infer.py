@@ -69,7 +69,7 @@ def run_inference(config_path: str, checkpoint_path: str, image_path: str, top_k
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Predict cat breed for one image.")
+    parser = argparse.ArgumentParser(description="Predict cat or dog breed for one image.")
     parser.add_argument("--config", default="configs/baseline.yaml")
     parser.add_argument("--checkpoint", default="outputs/checkpoints/best.pt")
     parser.add_argument("--image", required=True)

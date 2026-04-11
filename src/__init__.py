@@ -1,1 +1,1 @@
-"""Cat breed classifier baseline package."""
+"""Cat and Dog breed classifier baseline package."""

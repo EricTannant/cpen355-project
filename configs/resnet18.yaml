@@ -22,9 +22,9 @@ data:
   num_workers: 0
 
 training:
-  model_name: resnet50
+  model_name: resnet18
   batch_size: 32
-  epochs: 10
+  epochs: 15
   learning_rate: 0.0003
   weight_decay: 0.0001
   use_class_weights: true
@@ -34,7 +34,7 @@ training:
   gpu_id: 0
 
 paths:
-  checkpoint_dir: outputs/checkpoints/baseline
+  checkpoint_dir: outputs/checkpoints/resnet18
 
 inference:
   top_k: 3

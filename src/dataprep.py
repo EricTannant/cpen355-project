@@ -89,7 +89,7 @@ def run_dataprep(config_path: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Prepare cat breed dataset splits.")
+    parser = argparse.ArgumentParser(description="Prepare cat and dog breed dataset splits.")
     parser.add_argument(
         "--config",
         default="configs/baseline.yaml",
