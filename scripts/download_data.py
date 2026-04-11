@@ -42,7 +42,7 @@ def download_dataset(config_path: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Download full Kaggle cat-breeds dataset.")
-    parser.add_argument("--config", default="configs/baseline.yaml")
+    parser.add_argument("--config", default="configs/resnet50.yaml")
     args = parser.parse_args()
     download_dataset(args.config)
 

@@ -1,5 +1,5 @@
 project:
-  seed: 42
+  seed: 0
 
 data:
   dataset_id: zippyz/cats-and-dogs-breeds-classification-oxford-dataset

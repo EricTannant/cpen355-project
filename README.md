@@ -17,8 +17,8 @@ PyTorch pipeline for 8-breed pet (dog/cat) breed image classification using the 
 
 ```
 configs/
-	baseline.yaml
 	cnn.yaml
+	resnet18.yaml
 	resnet50.yaml
 data/
 	raw/
@@ -56,8 +56,7 @@ pip install -r requirements.txt
 
 ## Configure selected breeds
 
-Edit `configs/baseline.yaml` and set `data.selected_breeds` to exactly 8 breed names
-that exist in the downloaded dataset.
+Edit `configs/cnn.yaml` or `configs/resnet50.yaml` and set `data.selected_breeds` to exactly 8 breed names that exist in the downloaded dataset.
 
 Example:
 
@@ -83,13 +82,13 @@ Run in this order:
 1. Download raw dataset:
 
 ```powershell
-python scripts/download_data.py --config configs/baseline.yaml
+python scripts/download_data.py --config configs/cnn.yaml
 ```
 
 2. Prepare filtered metadata and splits (required before train/evaluate):
 
 ```powershell
-python scripts/prepare_data.py --config configs/baseline.yaml
+python scripts/prepare_data.py --config configs/cnn.yaml
 ```
 
 3. Train model.
@@ -112,18 +111,18 @@ Evaluate:
 python -m src.evaluate --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/best.pt
 ```
 
-### ResNet50 baseline
+### ResNet50
 
 Train:
 
 ```powershell
-python -m src.train --config configs/baseline.yaml
+python -m src.train --config configs/resnet50.yaml
 ```
 
 Evaluate:
 
 ```powershell
-python -m src.evaluate --config configs/baseline.yaml --checkpoint outputs/checkpoints/baseline/best.pt
+python -m src.evaluate --config configs/resnet50.yaml --checkpoint outputs/checkpoints/resnet50/best.pt
 ```
 
 ### ResNet50 extended config
@@ -153,7 +152,7 @@ Data prep writes to `data/processed/`:
 Model checkpoints:
 
 - CNN: `outputs/checkpoints/cnn/`
-- Baseline ResNet50: `outputs/checkpoints/baseline/`
+- Resnet18: `outputs/checkpoints/resnet18/`
 - ResNet50 config: `outputs/checkpoints/resnet50/`
 
 Metrics:

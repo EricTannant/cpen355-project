@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import os
+import random
 from pathlib import Path
 from typing import Any, Dict
 
+import numpy as np
+import torch
 import yaml
 
 
@@ -38,3 +42,13 @@ def validate_baseline_constraints(config: Dict[str, Any]) -> None:
         raise ValueError(
             "This baseline enforces data.image_size = 224 for all pipelines."
         )
+
+
+def fix_seed(seed: int, deterministic: bool = True) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)

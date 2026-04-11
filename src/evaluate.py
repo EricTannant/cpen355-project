@@ -8,7 +8,7 @@ import pandas as pd
 import torch
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from src.config import validate_baseline_constraints
+from src.config import fix_seed, validate_baseline_constraints
 from src.dataset import create_test_dataloader
 from src.train import resolve_device
 
@@ -19,6 +19,7 @@ def run_evaluation(config_path: str, checkpoint_path: str | None) -> None:
     with Path(config_path).open("r", encoding="utf-8") as handle:
         config = yaml.safe_load(handle)
     validate_baseline_constraints(config)
+    fix_seed(int(config["project"]["seed"]))
 
     data_cfg = config["data"]
     train_cfg = config["training"]
@@ -130,7 +131,7 @@ def run_evaluation(config_path: str, checkpoint_path: str | None) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate trained model on test split.")
-    parser.add_argument("--config", default="configs/baseline.yaml")
+    parser.add_argument("--config", default="configs/resnet50.yaml")
     parser.add_argument("--checkpoint", default=None)
     args = parser.parse_args()
     run_evaluation(args.config, args.checkpoint)

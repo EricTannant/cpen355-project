@@ -37,7 +37,7 @@ def validate_selected_breeds(selected_breeds: list[str], available_breeds: list[
     if len(selected_breeds) != 8:
         raise ValueError(
             f"Exactly 8 breeds are required, got {len(selected_breeds)}. "
-            "Set data.selected_breeds in configs/baseline.yaml."
+            "Set data.selected_breeds in configs/resnet50.yaml."
         )
 
     if len(set(selected_breeds)) != len(selected_breeds):

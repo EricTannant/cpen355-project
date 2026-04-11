@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from src.config import ensure_directories, load_config, validate_baseline_constraints
+from src.config import ensure_directories, load_config, fix_seed, validate_baseline_constraints
 from src.data_utils import build_full_metadata, validate_selected_breeds
 
 
@@ -40,6 +40,7 @@ def run_dataprep(config_path: str) -> None:
     ensure_directories(config)
 
     seed = int(config["project"]["seed"])
+    fix_seed(seed)
     data_cfg = config["data"]
     raw_dir = Path(data_cfg["raw_dir"])
     processed_dir = Path(data_cfg["processed_dir"])
@@ -92,7 +93,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Prepare cat and dog breed dataset splits.")
     parser.add_argument(
         "--config",
-        default="configs/baseline.yaml",
+        default="configs/resnet50.yaml",
         help="Path to config file.",
     )
     args = parser.parse_args()

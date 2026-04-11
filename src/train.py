@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.optim import AdamW
 from tqdm import tqdm
 
-from src.config import ensure_directories, load_config, validate_baseline_constraints
+from src.config import ensure_directories, load_config, fix_seed, validate_baseline_constraints
 from src.dataset import create_dataloaders
 from src.models import build_model
 
@@ -99,9 +99,7 @@ def run_training(config_path: str) -> None:
     ensure_directories(config)
 
     seed = int(config["project"]["seed"])
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+    fix_seed(seed)
 
     data_cfg = config["data"]
     train_cfg = config["training"]
@@ -210,7 +208,7 @@ def run_training(config_path: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train cat/dog breed classifier.")
-    parser.add_argument("--config", default="configs/baseline.yaml")
+    parser.add_argument("--config", default="configs/resnet50.yaml")
     args = parser.parse_args()
     run_training(args.config)
 

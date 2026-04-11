@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 from PIL import Image
 
-from src.config import validate_baseline_constraints
+from src.config import fix_seed, validate_baseline_constraints
 from src.dataset import build_transform
 from src.models import build_model
 from src.train import resolve_device
@@ -19,6 +19,7 @@ def run_inference(config_path: str, checkpoint_path: str, image_path: str, top_k
     with Path(config_path).open("r", encoding="utf-8") as handle:
         config = yaml.safe_load(handle)
     validate_baseline_constraints(config)
+    fix_seed(int(config["project"]["seed"]))
 
     checkpoint_path_obj = Path(checkpoint_path)
     if not checkpoint_path_obj.exists():
@@ -70,7 +71,7 @@ def run_inference(config_path: str, checkpoint_path: str, image_path: str, top_k
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Predict cat or dog breed for one image.")
-    parser.add_argument("--config", default="configs/baseline.yaml")
+    parser.add_argument("--config", default="configs/resnet50.yaml")
     parser.add_argument("--checkpoint", default="outputs/checkpoints/best.pt")
     parser.add_argument("--image", required=True)
     parser.add_argument("--top-k", type=int, default=3)
