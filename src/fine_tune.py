@@ -291,6 +291,18 @@ def optimize_cnn_values(
 
     maximize = objective_key == "val_acc"
 
+    print(
+        json.dumps(
+            {
+                "event": "fine_tune_start",
+                "objective": objective_key,
+                "num_candidates": len(candidates),
+                "device": str(device),
+            },
+            indent=2,
+        )
+    )
+
     checkpoints_root = Path(
         config.get("paths", {}).get("checkpoint_dir", "outputs/checkpoints/cnn")
     ) / "fine_tune"
@@ -304,6 +316,17 @@ def optimize_cnn_values(
 
     for trial_index, candidate in enumerate(candidates, start=1):
         trial_dir = checkpoints_root / f"trial_{trial_index:03d}"
+        print(
+            json.dumps(
+                {
+                    "event": "trial_start",
+                    "trial": trial_index,
+                    "total_trials": len(candidates),
+                    "candidate": candidate,
+                },
+                indent=2,
+            )
+        )
         result = train_cnn_candidate(
             config=config,
             candidate=candidate,
@@ -314,6 +337,19 @@ def optimize_cnn_values(
         )
 
         score = float(result["best_score"])
+        print(
+            json.dumps(
+                {
+                    "event": "trial_end",
+                    "trial": trial_index,
+                    "score": score,
+                    "best_epoch": result["best_epoch"],
+                    "best_val_acc": result["best_val_acc"],
+                    "best_val_loss": result["best_val_loss"],
+                },
+                indent=2,
+            )
+        )
         result_with_score = dict(result)
         result_with_score["score"] = score
         result_with_score["objective"] = objective_key
@@ -328,6 +364,17 @@ def optimize_cnn_values(
         if is_better:
             best_result = result_with_score
             best_score = score
+            print(
+                json.dumps(
+                    {
+                        "event": "new_best",
+                        "trial": trial_index,
+                        "best_score": best_score,
+                        "best_checkpoint": best_result["best_checkpoint"],
+                    },
+                    indent=2,
+                )
+            )
 
     summary = {
         "objective": objective_key,
