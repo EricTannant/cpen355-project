@@ -11,8 +11,8 @@ class CNN(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        conv_channels: Sequence[int] = (32, 64, 128, 256),
-        hidden_dim: int = 128,
+        conv_channels: Sequence[int] = (32, 64, 128, 256, 256),
+        hidden_dim: int = 256,
         feature_dropout: float = 0.4,
         classifier_dropout: float = 0.2,
     ) -> None:

@@ -22,12 +22,12 @@ data:
 
 training:
   model_name: custom_cnn
-  batch_size: 32
+  batch_size: 16
   epochs: 20
-  learning_rate: 0.001
-  weight_decay: 0.0001
+  learning_rate: 0.0003
+  weight_decay: 0.0002
   use_class_weights: true
-  early_stopping_patience: 5
+  early_stopping_patience: 4
   freeze_backbone: false
   device: cuda
   gpu_id: 0

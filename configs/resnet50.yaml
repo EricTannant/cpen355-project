@@ -38,7 +38,7 @@ fine_tuning:
     weight_decay: [0.00001, 0.0001, 0.0005]
     batch_size: [16, 32, 64]
     epochs: [10, 15, 20, 25]
-    early_stopping_patience: [3, 4, 5, 6]
+    early_stopping_patience: [5, 10]
   optuna:
     startup_trials: 6
     warmup_epochs: 5
