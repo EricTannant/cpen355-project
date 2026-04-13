@@ -34,14 +34,18 @@ def build_full_metadata(raw_dir: Path) -> pd.DataFrame:
 
 
 def validate_selected_breeds(selected_breeds: list[str], available_breeds: list[str]) -> None:
-    if len(selected_breeds) != 8:
+    if not selected_breeds:
         raise ValueError(
-            f"Exactly 8 breeds are required, got {len(selected_breeds)}. "
-            "Set data.selected_breeds in configs/resnet50.yaml."
+            "No breeds configured. Set data.selected_breeds in your config file."
+        )
+
+    if len(selected_breeds) < 2:
+        raise ValueError(
+            f"At least 2 breeds are required for classification, got {len(selected_breeds)}."
         )
 
     if len(set(selected_breeds)) != len(selected_breeds):
-        raise ValueError("Selected breeds contain duplicates. Provide 8 unique breed names.")
+        raise ValueError("Selected breeds contain duplicates. Provide unique breed names.")
 
     missing = sorted(set(selected_breeds) - set(available_breeds))
     if missing:

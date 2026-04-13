@@ -45,10 +45,10 @@ def default_search_space(model_name: str) -> dict[str, tuple[Any, ...]]:
     if _is_cnn_model(model_name):
         return {
             "learning_rate": (1e-3, 5e-4, 3e-4),
-            "weight_decay": (1e-4, 2e-4, 5e-4),
+            "weight_decay": (1e-4, 2e-4, 5e-4, 1e-3),
             "batch_size": (16, 32, 64),
-            "epochs": (12, 16, 20),
-            "early_stopping_patience": (4, 5, 6),
+            "epochs": (15, 20, 25),
+            "early_stopping_patience": (5, 10),
             "conv_channels": ((32, 64, 128, 256), (32, 64, 128, 128), (32, 64, 128, 256, 256)),
             "hidden_dim": (128, 192, 256),
             "feature_dropout": (0.2, 0.3, 0.4),
@@ -56,11 +56,11 @@ def default_search_space(model_name: str) -> dict[str, tuple[Any, ...]]:
         }
 
     return {
-        "learning_rate": (1e-4, 2e-4, 3e-4, 5e-4),
-        "weight_decay": (1e-5, 1e-4, 5e-4),
-        "batch_size": (16, 32),
-        "epochs": (10, 12, 15, 18),
-        "early_stopping_patience": (3, 4, 5, 6),
+        "learning_rate": (1e-4, 2e-4, 5e-4),
+        "weight_decay": (5e-5, 1e-4, 5e-4),
+        "batch_size": (16, 32, 64),
+        "epochs": (15, 20, 25),
+        "early_stopping_patience": (5, 10),
     }
 
 
@@ -468,6 +468,8 @@ def optimize_cnn_values(
                 entry = dict(result)
             else:
                 entry = {}
+            # Keep summary compact: epoch-level logs stay in per-trial history.json files.
+            entry.pop("history", None)
             entry.setdefault("trial_number", trial.number + 1)
             entry["state"] = "COMPLETE"
             trial_results.append(entry)
@@ -509,6 +511,12 @@ def optimize_cnn_values(
             if trial_dir.exists() and not any(trial_dir.iterdir()):
                 shutil.rmtree(trial_dir, ignore_errors=True)
 
+    best_hyperparameters = None
+    if best_result is not None:
+        candidate = best_result.get("candidate")
+        if isinstance(candidate, Mapping):
+            best_hyperparameters = dict(candidate)
+
     summary = {
         "objective": objective_key,
         "direction": direction,
@@ -517,6 +525,7 @@ def optimize_cnn_values(
         "n_trials_requested": trial_budget,
         "n_trials_completed": len(complete_results),
         "best_score": best_score,
+        "best_hyperparameters": best_hyperparameters,
         "best_result": best_result,
         "trials": trial_results,
     }

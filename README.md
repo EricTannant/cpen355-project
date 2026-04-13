@@ -1,147 +1,121 @@
 # CPEN355 Project
 
-PyTorch pipeline for 8-breed pet (dog/cat) breed image classification using the Kaggle dataset:
+PyTorch pipeline for 8-breed cat/dog image classification using the Kaggle dataset:
 `zippyz/cats-and-dogs-breeds-classification-oxford-dataset`
 
-## What is implemented
+## Overview
 
-- Full dataset download helper (downloads all breeds, no filtering).
-- Config-driven dataprep that requires exactly 8 selected breeds.
-- Deterministic stratified train/val/test split generation.
-- Fixed image preprocessing to 224x224 for train, eval, and inference.
-- Training for both a custom CNN and transfer-learning ResNet50.
-- Evaluation script with classification metrics and confusion matrix export.
-- Single-image inference CLI with top-k probabilities.
+This project supports:
 
-## Project structure
+- Data download and preprocessing for a custom number of selected breeds (default 8).
+- Training with `custom_cnn`, `resnet18`, or `resnet50` models.
+- Optuna fine-tuning.
+- Evaluation with metrics + confusion matrix to identify hardest to classify breeds.
+- Single-image inference with top-k predictions for specific testing.
+
+## Project Layout
 
 ```
 configs/
-	cnn.yaml
-	resnet18.yaml
-	resnet50.yaml
-data/
-	raw/
-	processed/
-outputs/
-	checkpoints/
-	metrics/
+  cnn.yaml
+  resnet18.yaml
+  resnet50.yaml
 scripts/
-	download_data.py
-	prepare_data.py
+  download_data.py
+  prepare_data.py
 src/
-	config.py
-	data_utils.py
-	dataprep.py
-	dataset.py
-	models.py
-	train.py
-	evaluate.py
-	infer.py
+  train.py
+  fine_tune.py
+  evaluate.py
+  infer.py
+data/
+  raw/
+  processed/
+outputs/
+  checkpoints/
+  metrics/
 ```
 
-## Setup
+## Setup (Windows PowerShell)
 
-1. Create and activate a Python virtual environment.
-2. Install dependencies:
+1. Create and activate the virtual environment.
 
 ```powershell
-pip install -r requirements.txt
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-3. Set up Kaggle credentials on Windows:
+2. Install dependencies.
 
-- Put `kaggle.json` in `%USERPROFILE%\.kaggle\kaggle.json`.
-- Ensure file permissions are private.
-
-## Configure selected breeds
-
-Edit `configs/cnn.yaml` or `configs/resnet50.yaml` and set `data.selected_breeds` to exactly 8 breed names that exist in the downloaded dataset.
-
-Example:
-
-```yaml
-data:
-	selected_breeds:
-		- Sphynx
-		- Siamese
-		- Russian_Blue
-		- Bengal
-		- pug
-		- great_pyrenees
-		- shiba_inu
-		- yorkshire_terrier
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
-Note: dataprep fails if the list is not exactly 8 unique valid breeds.
+3. Configure Kaggle credentials.
 
-## Local run order
+- Put `kaggle.json` at `%USERPROFILE%\.kaggle\kaggle.json`. (On Linux `~\.kaggle\kaggle.json`)
+- Ensure permissions are private.
 
-Run in this order:
+## Configure Breeds
 
-1. Download raw dataset:
+Set exactly the number of breeds in `data.selected_breeds` in your chosen config file (for example `configs/cnn.yaml`).
+
+## End-to-End Quick Start
+
+Use one config consistently (for example `configs/cnn.yaml`):
 
 ```powershell
 python scripts/download_data.py --config configs/cnn.yaml
-```
-
-2. Prepare filtered metadata and splits (required before train/evaluate):
-
-```powershell
 python scripts/prepare_data.py --config configs/cnn.yaml
+python -m src.train --config configs/cnn.yaml
+python -m src.evaluate --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/best.pt
+python -m src.infer --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/best.pt --image data/raw/images/pug_82.jpg --top-k 3
 ```
 
-3. Train model.
+## Train by Model
 
-4. Evaluate model.
-
-## Train and evaluate each model
-
-### CNN
-
-Train:
+CNN:
 
 ```powershell
 python -m src.train --config configs/cnn.yaml
 ```
 
-Evaluate:
+ResNet18:
 
 ```powershell
-python -m src.evaluate --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/best.pt
+python -m src.train --config configs/resnet18.yaml
 ```
 
-### ResNet50
-
-Train:
+ResNet50:
 
 ```powershell
 python -m src.train --config configs/resnet50.yaml
 ```
 
-Evaluate:
+## Fine-Tuning
+
+Run fine-tuning by selecting the config, value to maximize and number of runs:
 
 ```powershell
-python -m src.evaluate --config configs/resnet50.yaml --checkpoint outputs/checkpoints/resnet50/best.pt
+python -m src.fine_tune --config configs/cnn.yaml --objective val_acc --max-trials 30
 ```
 
-### ResNet50 extended config
+Outputs:
 
-Train:
+- Trial checkpoints: `outputs/checkpoints/cnn/fine_tune/trial_XXX/`
+- Summary file: `outputs/metrics/custom_cnn_fine_tune_summary.json`
+
+Use a fine-tuned trial checkpoint for eval/inference:
 
 ```powershell
-python -m src.train --config configs/resnet50.yaml
+python -m src.evaluate --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/fine_tune/trial_101/best.pt
+python -m src.infer --config configs/cnn.yaml --checkpoint outputs/checkpoints/cnn/fine_tune/trial_101/best.pt --image data/raw/images/pug_10.jpg --top-k 3
 ```
 
-Evaluate:
+## Main Output Files
 
-```powershell
-python -m src.evaluate --config configs/resnet50.yaml --checkpoint outputs/checkpoints/resnet50/best.pt
-```
-
-## Output files
-
-Data prep writes to `data/processed/`:
+Data prep (`data/processed/`):
 
 - `metadata_full.csv`
 - `metadata_filtered.csv`
@@ -149,27 +123,26 @@ Data prep writes to `data/processed/`:
 - `label_to_index.json`
 - `split_summary.json`
 
-Model checkpoints:
+Training checkpoints:
 
 - CNN: `outputs/checkpoints/cnn/`
-- Resnet18: `outputs/checkpoints/resnet18/`
-- ResNet50 config: `outputs/checkpoints/resnet50/`
+- ResNet18: `outputs/checkpoints/resnet18/`
+- ResNet50: `outputs/checkpoints/resnet50/`
 
-Metrics:
+Evaluation metrics (`outputs/metrics/`):
 
-- `outputs/metrics/eval_metrics.json`
-- `outputs/metrics/confusion_matrix.csv`
+- `eval_metrics.json`
+- `eval_metrics_<config_name>.json`
+- `confusion_matrix.csv`
+- `confusion_matrix_<config_name>.csv`
 
-## Colab workflow
+## Troubleshooting
 
-Upload the `project_workflow.ipynb` notebook to Google colab and run the cells.
+- Training/evaluation defaults to CUDA and falls back to CPU when CUDA is unavailable.
+- `training.gpu_id` controls which GPU index is used.
 
-Note: Either manually create the `~/.kaggle/kaggle.json` file or add it to your Google Drive under `Drive/kaggle/kaggle.json` which will be automatically cloned via the notebook cells.
+## Colab
 
-## Notes
+Use the `project_workflow.ipynb` notebook in Google Colab and run the provided cells in order.
 
-- Image shape is fixed to 224x224 via torchvision `Resize((224, 224))`.
-- The current validation rule requires exactly 8 classes, though this may be expanded in the future.
-- Evaluation artifacts are saved under `outputs/metrics/`.
-- Training defaults to CUDA and falls back to CPU if CUDA is unavailable.
-- Single-GPU training is controlled with `training.gpu_id` (default `0`).
+If using Kaggle in Colab, place `kaggle.json` in Google Drive (`Drive/kaggle/kaggle.json`) and mount Drive before running data download.

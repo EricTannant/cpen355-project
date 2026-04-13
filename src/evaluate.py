@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Mapping
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +12,61 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from src.config import fix_seed, validate_baseline_constraints
 from src.dataset import create_test_dataloader
 from src.train import resolve_device
+
+
+def _resolve_model_from_checkpoint(
+    runtime_config: Mapping[str, object],
+    checkpoint: Mapping[str, object],
+    num_classes: int,
+):
+    from src.models import build_model
+
+    runtime_training = runtime_config.get("training", {})
+    if not isinstance(runtime_training, Mapping):
+        runtime_training = {}
+
+    checkpoint_config = checkpoint.get("config", {})
+    if not isinstance(checkpoint_config, Mapping):
+        checkpoint_config = {}
+
+    checkpoint_training = checkpoint_config.get("training", {})
+    if not isinstance(checkpoint_training, Mapping):
+        checkpoint_training = {}
+
+    model_name = str(
+        checkpoint_training.get("model_name", runtime_training.get("model_name", "custom_cnn"))
+    )
+    freeze_backbone = bool(
+        checkpoint_training.get("freeze_backbone", runtime_training.get("freeze_backbone", False))
+    )
+
+    model_kwargs: dict[str, object] = {}
+    if model_name.lower() in {"custom_cnn", "cnn"}:
+        tuned_cfg = checkpoint_config.get("fine_tuning_model", {})
+        if not isinstance(tuned_cfg, Mapping):
+            tuned_cfg = {}
+
+        fallback_candidate = checkpoint_config.get("fine_tuning_candidate", {})
+        if not isinstance(fallback_candidate, Mapping):
+            fallback_candidate = {}
+
+        cnn_source: Mapping[str, object] = tuned_cfg if tuned_cfg else fallback_candidate
+        if cnn_source:
+            if "conv_channels" in cnn_source:
+                model_kwargs["conv_channels"] = tuple(cnn_source["conv_channels"])
+            if "hidden_dim" in cnn_source:
+                model_kwargs["hidden_dim"] = int(cnn_source["hidden_dim"])
+            if "feature_dropout" in cnn_source:
+                model_kwargs["feature_dropout"] = float(cnn_source["feature_dropout"])
+            if "classifier_dropout" in cnn_source:
+                model_kwargs["classifier_dropout"] = float(cnn_source["classifier_dropout"])
+
+    return build_model(
+        model_name=model_name,
+        num_classes=num_classes,
+        freeze_backbone=freeze_backbone,
+        model_kwargs=model_kwargs,
+    )
 
 
 def run_evaluation(config_path: str, checkpoint_path: str | None) -> None:
@@ -43,12 +99,10 @@ def run_evaluation(config_path: str, checkpoint_path: str | None) -> None:
     label_to_index = checkpoint["label_to_index"]
     index_to_label = {int(v): k for k, v in label_to_index.items()}
 
-    from src.models import build_model
-
-    model = build_model(
-        model_name=str(train_cfg["model_name"]),
+    model = _resolve_model_from_checkpoint(
+        runtime_config=config,
+        checkpoint=checkpoint,
         num_classes=len(label_to_index),
-        freeze_backbone=False,
     )
     model.load_state_dict(checkpoint["model_state_dict"])
 

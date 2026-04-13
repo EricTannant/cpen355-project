@@ -109,8 +109,17 @@ def run_training(config_path: str) -> None:
         label_to_index = json.load(handle)
 
     num_classes = len(label_to_index)
-    if num_classes != 8:
-        raise ValueError(f"Expected 8 configured breeds, found {num_classes} classes.")
+    configured_breeds = data_cfg.get("selected_breeds", [])
+    if configured_breeds:
+        expected_classes = len(set(configured_breeds))
+        if num_classes != expected_classes:
+            raise ValueError(
+                "Class count mismatch between config and prepared data: "
+                f"expected {expected_classes}, found {num_classes}. "
+                "Re-run scripts/prepare_data.py with the same config."
+            )
+    elif num_classes < 2:
+        raise ValueError(f"At least 2 classes are required for training, found {num_classes}.")
 
     train_loader, val_loader, _ = create_dataloaders(
         processed_dir=processed_dir,
