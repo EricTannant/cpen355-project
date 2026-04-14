@@ -1,7 +1,7 @@
 # CPEN355 Project - Cat and Dog Breed Classification
 
 Pipeline for image classification using PyTorch and the Kaggle Oxford-style breed dataset:
-zippyz/cats-and-dogs-breeds-classification-oxford-dataset
+`zippyz/cats-and-dogs-breeds-classification-oxford-dataset`
 
 ## 1. What This Project Does
 
