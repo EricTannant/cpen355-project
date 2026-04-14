@@ -3,6 +3,9 @@
 Pipeline for image classification using PyTorch and the Kaggle Oxford-style breed dataset:
 `zippyz/cats-and-dogs-breeds-classification-oxford-dataset`
 
+Kaggle dataset link:
+https://www.kaggle.com/datasets/zippyz/cats-and-dogs-breeds-classification-oxford-dataset
+
 ## 1. What This Project Does
 
 The project provides an end-to-end workflow for:
