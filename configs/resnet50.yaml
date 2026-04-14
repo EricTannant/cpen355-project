@@ -35,11 +35,11 @@ data:
 training:
   model_name: resnet50
   batch_size: 32
-  epochs: 15
+  epochs: 20
   learning_rate: 0.0003
-  weight_decay: 0.0001
+  weight_decay: 0.00001
   use_class_weights: true
-  early_stopping_patience: 4
+  early_stopping_patience: 5
   freeze_backbone: false
   device: cuda
   gpu_id: 0
@@ -52,7 +52,7 @@ fine_tuning:
     epochs: [10, 15, 20, 25]
     early_stopping_patience: [5, 10]
   optuna:
-    startup_trials: 6
+    startup_trials: 3
     warmup_epochs: 3
     pruning_interval_steps: 1
 
