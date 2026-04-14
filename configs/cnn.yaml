@@ -14,6 +14,18 @@ data:
     - great_pyrenees
     - shiba_inu
     - yorkshire_terrier
+    # - Abyssinian
+    # - British_Shorthair
+    # - Egyptian_Mau
+    # - Maine_Coon
+    # - miniature_pinscher
+    # - Persian
+    # - basset_hound
+    # - beagle
+    # - havanese
+    # - japanese_chin
+    # - keeshond
+    # - newfoundland
   train_ratio: 0.7
   val_ratio: 0.15
   test_ratio: 0.15
@@ -23,7 +35,7 @@ data:
 training:
   model_name: custom_cnn
   batch_size: 16
-  epochs: 20
+  epochs: 30
   learning_rate: 0.0003
   weight_decay: 0.0002
   use_class_weights: true

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -111,16 +112,29 @@ def run_inference(config_path: str, checkpoint_path: str, image_path: str, top_k
     image = Image.open(image_path_obj).convert("RGB")
     x = transform(image).unsqueeze(0).to(device)
 
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    start_time = time.perf_counter()
+
     with torch.no_grad():
         logits = model(x)
         probs = torch.softmax(logits, dim=1)
         values, indices = torch.topk(probs, k=min(top_k, probs.size(1)), dim=1)
 
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    inference_time_seconds = time.perf_counter() - start_time
+
     results = []
     for score, idx in zip(values[0].cpu().tolist(), indices[0].cpu().tolist()):
         results.append({"breed": index_to_label[int(idx)], "probability": float(score)})
 
-    print(json.dumps(results, indent=2))
+    output = {
+        "inference_time_seconds": inference_time_seconds,
+        "inference_time_ms": inference_time_seconds * 1000.0,
+        "predictions": results,
+    }
+    print(json.dumps(output, indent=2))
 
 
 def main() -> None:
